@@ -19,11 +19,15 @@ fn load_todos(path: &str) -> Vec<Todo> {
 }
 
 fn save_todos(path: &str, todos: &Vec<Todo>) {
-    if let Ok(json) = serde_json::to_string_pretty(todos) {
-        let _ = fs::write(path, json);
+    match serde_json::to_string_pretty(todos) {
+        Ok(json) => {
+            if let Err(e) = fs::write(path, json) {
+                eprintln!("Error: Failed to save todos: {}", e);
+            }
+        }
+        Err(e) => eprintln!("Error: Failed to serialize todos: {}", e)
     }
 }
-
 fn main() {
     let file_path = "todos.json";
     let mut todos: Vec<Todo> = load_todos(file_path);
